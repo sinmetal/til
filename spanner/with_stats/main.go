@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/spanner"
 	"github.com/k0kubun/pp"
 	"google.golang.org/api/iterator"
 )
 
+const DatastoreProjectID = "sinmetal-ci"
+
 var sc *spanner.Client
+var ds *datastore.Client
 
 func main() {
 	ctx := context.Background()
@@ -19,8 +23,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	ds, err = datastore.NewClient(ctx, DatastoreProjectID)
+	if err != nil {
+		panic(err)
+	}
 
 	PrintStats(ctx)
+	AnalyzeQuery(ctx)
 }
 
 // PrintStats is QueryWithStatsのStatsを見る
