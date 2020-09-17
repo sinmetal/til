@@ -34,3 +34,9 @@ DeleteSession:AN4G3x8a8UTfsEjG-hP9nFluQLtX4hWKpXRUC7OhIYSxvqexPA6YzIr3Z5gd, text
 ### CPUは高止まりのまま
 
 ![CPU Utilization](cpu_utilization.png "CPU Utilization")
+
+## contextをcancelするとどうなる？
+
+contextをcancelしてしまえば、QueryはRetryとかされずに止まるので、contextをcancelしてしまうのが一番手っ取り早い
+
+![CPU Utilization](context_cancel.png "CPU Utilization Context Cancel")

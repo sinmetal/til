@@ -23,9 +23,6 @@ func NewSpannerService(ctx context.Context, spannerClient *spanner.Client, oaqs 
 }
 
 func (s *SpannerService) RunSingleQuery(ctx context.Context, statement spanner.Statement) error {
-	//ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	//defer cancel()
-
 	fmt.Println("Start RunSingleQuery()")
 	iter := s.sc.Single().Query(ctx, statement)
 	defer iter.Stop()

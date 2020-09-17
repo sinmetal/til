@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"google.golang.org/api/spanner/v1"
 	"testing"
+
+	"google.golang.org/api/spanner/v1"
 )
 
 func TestOldestActiveQueriesService_ExecuteStreamingSql(t *testing.T) {

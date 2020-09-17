@@ -45,6 +45,7 @@ func (s *OldestActiveQueriesService) ExecuteStreamingSql(ctx context.Context, se
 	if err != nil {
 		return err
 	}
+
 	fmt.Printf("result.ServerResponse:%+v\n", result.ServerResponse)
 	fmt.Printf("result.Metadata:%+v\n", result.Metadata)
 	for _, v := range result.Values {

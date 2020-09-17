@@ -62,7 +62,7 @@ LIMIT 100000`
 			if err := ss.RunSingleQuery(ctx, spanner.NewStatement(sql)); err != nil {
 				fmt.Printf("failed RunSingleQuery() err=%+v\n", err)
 			}
-			time.Sleep(10 * time.Minute)
+			time.Sleep(30 * time.Minute)
 		}
 	}()
 
@@ -81,29 +81,29 @@ LIMIT 100000`
 			if err := ss.RunRWTxQuery(ctx, spanner.NewStatement(sql)); err != nil {
 				fmt.Printf("failed RunRWTxQuery() err=%+v\n", err)
 			}
-			time.Sleep(10 * time.Minute)
+			time.Sleep(30 * time.Minute)
 		}
 	}()
 
-	go func() {
-		time.Sleep(60 * time.Second)
-		sc, err := createClient(ctx, GCPUGPublicSpannerDatabase)
-		if err != nil {
-			panic(err)
-		}
-		oaqs, err := NewOldestActiveQueriesService(ctx)
-		if err != nil {
-			panic(err)
-		}
-		ss := NewSpannerService(ctx, sc, oaqs)
-
-		for {
-			if err := ss.QueryOldestActiveQueries(ctx); err != nil {
-				fmt.Printf("failed QueryOldestActiveQueries() err=%+v\n", err)
-			}
-			time.Sleep(60 * time.Second)
-		}
-	}()
+	//go func() {
+	//	time.Sleep(60 * time.Second)
+	//	sc, err := createClient(ctx, GCPUGPublicSpannerDatabase)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	oaqs, err := NewOldestActiveQueriesService(ctx)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	ss := NewSpannerService(ctx, sc, oaqs)
+	//
+	//	for {
+	//		if err := ss.QueryOldestActiveQueries(ctx); err != nil {
+	//			fmt.Printf("failed QueryOldestActiveQueries() err=%+v\n", err)
+	//		}
+	//		time.Sleep(60 * time.Second)
+	//	}
+	//}()
 
 	sig := <-quit
 
