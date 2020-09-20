@@ -10,10 +10,12 @@ import (
 
 type TilSpannerProfileV1 struct {
 	QueryProfileV1 QueryPlan
+	Number         int
 }
 
 type TilSpannerProfileV2 struct {
 	QueryProfileV2 QueryPlan
+	Number         int64
 }
 
 func AnalyzeQuery(ctx context.Context) {
@@ -37,6 +39,7 @@ SELECT 1
 
 	e := TilSpannerProfileV1{
 		QueryProfileV1: qp,
+		Number:         100,
 	}
 	key, err := mds.Put(ctx, mds.NameKey("TilSpannerProfile", "v1", nil), &e)
 	if err != nil {
