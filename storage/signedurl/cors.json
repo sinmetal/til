@@ -1,0 +1,8 @@
+[
+    {
+      "origin": ["http://localhost:8080"],
+      "responseHeader": ["Content-Type", "Authorization",  "Content-Length", "Content-Disposition", "User-Agent", "x-goog-resumable"],
+      "method": ["GET", "PUT", "OPTIONS"],
+      "maxAgeSeconds": 3600
+    }
+]
