@@ -68,7 +68,10 @@ func (s *StorageSignedURLService) CreateDownloadURL(ctx context.Context, bucket 
 		Method:         "GET",
 		Expires:        expires,
 		Headers:        headers,
-		Scheme:         storage.SigningSchemeV2, // V4 だと response-content-x を検証してしまうので、V2にしている
+		// V4 だと response-content-x を検証してしまうので、V2にしている
+		// V2 は https://cloud.google.com/storage/docs/access-control/signed-urls-v2?hl=en に response-content-x は見ないよって書いてある
+		// Note: Query String Parameters like response-content-disposition and response-content-type are not verified by the signature. To force a Content-Disposition or Content-Type in the response, set those parameters in the object metadata using gsutil or the XML/JSON API.
+		Scheme: storage.SigningSchemeV2,
 		// To avoid management for private key, use SignBytes instead of PrivateKey.
 		// In this example, we are using the `iam.serviceAccounts.signBlob` API for signing bytes.
 		// If you hope to avoid API call for signing bytes every time,
