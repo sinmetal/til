@@ -84,8 +84,8 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("Content-Type", "image/jpg")
-	// req.Header.Add("Content-Type", "image/jpg")
+	const contentType = "image/jpg"
+	req.Header.Set("Content-Type", contentType)
 	client := new(http.Client)
 	_, err = client.Do(req)
 	if err != nil {
@@ -93,24 +93,13 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	}
 	// ここまで File Upload
 
-	headers := []string{}
-	dlURL, err := signedURLService.CreateDownloadURL(ctx, bucket, object, headers, time.Now().Add(10*time.Minute))
+	responseContentDisposition := fmt.Sprintf(`attachment;filename*=UTF-8''%s`, url.PathEscape("いやっほー .jpeg"))
+	qp := url.Values{}
+	qp.Add("response-content-disposition", responseContentDisposition)
+	qp.Add("response-content-type", contentType)
+	dlURL, err := signedURLService.CreateDownloadURL(ctx, bucket, object, qp, time.Now().Add(10*time.Minute))
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(dlURL)
-
-	// 以下は Content-Disposition, Content-Type を設定するバージョン
-	downloadURL, err := url.Parse(dlURL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	vs, err := url.ParseQuery(downloadURL.RawQuery)
-	if err != nil {
-		t.Fatal(err)
-	}
-	vs.Add("response-content-disposition", fmt.Sprintf(`attachment; filename*=UTF-8''%s`, url.PathEscape("いえーいふぁいる")))
-	vs.Add("response-content-type", "image/jpg")
-	downloadURL.RawQuery = vs.Encode()
-	t.Log(downloadURL.String())
 }
