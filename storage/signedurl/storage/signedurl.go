@@ -62,12 +62,13 @@ func (s *StorageSignedURLService) CreatePutObjectURL(ctx context.Context, bucket
 	return url, nil
 }
 
-func (s *StorageSignedURLService) CreateDownloadURL(ctx context.Context, bucket string, object string, expires time.Time) (string, error) {
+func (s *StorageSignedURLService) CreateDownloadURL(ctx context.Context, bucket string, object string, headers []string, expires time.Time) (string, error) {
 	url, err := storage.SignedURL(bucket, object, &storage.SignedURLOptions{
 		GoogleAccessID: s.ServiceAccountName,
 		Method:         "GET",
 		Expires:        expires,
-		Scheme:         storage.SigningSchemeV4,
+		Headers:        headers,
+		Scheme:         storage.SigningSchemeV2, // V4 だと response-content-x を検証してしまうので、V2にしている
 		// To avoid management for private key, use SignBytes instead of PrivateKey.
 		// In this example, we are using the `iam.serviceAccounts.signBlob` API for signing bytes.
 		// If you hope to avoid API call for signing bytes every time,

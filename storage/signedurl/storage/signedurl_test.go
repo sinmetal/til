@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -69,7 +70,7 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 
 	const bucket = "sinmetal-ci-signed-url"
 	object := uuid.New().String()
-	url, err := signedURLService.CreatePutObjectURL(ctx, bucket, object, "image/jpg", time.Now().Add(10*time.Minute))
+	putURL, err := signedURLService.CreatePutObjectURL(ctx, bucket, object, "image/jpg", time.Now().Add(10*time.Minute))
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +80,7 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Generates *http.Request to request with PUT method to the Signed URL.
-	req, err := http.NewRequest("PUT", url, bytes.NewReader(b))
+	req, err := http.NewRequest("PUT", putURL, bytes.NewReader(b))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,9 +93,24 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	}
 	// ここまで File Upload
 
-	dlURL, err := signedURLService.CreateDownloadURL(ctx, bucket, object, time.Now().Add(10*time.Minute))
+	headers := []string{}
+	dlURL, err := signedURLService.CreateDownloadURL(ctx, bucket, object, headers, time.Now().Add(10*time.Minute))
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(dlURL)
+
+	// 以下は Content-Disposition, Content-Type を設定するバージョン
+	downloadURL, err := url.Parse(dlURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	vs, err := url.ParseQuery(downloadURL.RawQuery)
+	if err != nil {
+		t.Fatal(err)
+	}
+	vs.Add("response-content-disposition", fmt.Sprintf(`attachment; filename*=UTF-8''%s`, url.PathEscape("いえーいふぁいる")))
+	vs.Add("response-content-type", "image/jpg")
+	downloadURL.RawQuery = vs.Encode()
+	t.Log(downloadURL.String())
 }
