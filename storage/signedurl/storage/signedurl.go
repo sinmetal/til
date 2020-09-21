@@ -61,3 +61,31 @@ func (s *StorageSignedURLService) CreatePutObjectURL(ctx context.Context, bucket
 	}
 	return url, nil
 }
+
+func (s *StorageSignedURLService) CreateDownloadURL(ctx context.Context, bucket string, object string, expires time.Time) (string, error) {
+	url, err := storage.SignedURL(bucket, object, &storage.SignedURLOptions{
+		GoogleAccessID: s.ServiceAccountName,
+		Method:         "GET",
+		Expires:        expires,
+		Scheme:         storage.SigningSchemeV4,
+		// To avoid management for private key, use SignBytes instead of PrivateKey.
+		// In this example, we are using the `iam.serviceAccounts.signBlob` API for signing bytes.
+		// If you hope to avoid API call for signing bytes every time,
+		// you can use self hosted private key and pass it in Privatekey.
+		SignBytes: func(b []byte) ([]byte, error) {
+			// この関数 deprecated になってるから、移行する必要があるな July 1, 2021
+			resp, err := s.IAMService.Projects.ServiceAccounts.SignBlob(
+				s.ServiceAccountID,
+				&iam.SignBlobRequest{BytesToSign: base64.StdEncoding.EncodeToString(b)},
+			).Context(ctx).Do()
+			if err != nil {
+				return nil, err
+			}
+			return base64.StdEncoding.DecodeString(resp.Signature)
+		},
+	})
+	if err != nil {
+		return "", xerrors.Errorf("failed CreateDownloadURL: saName=%s,saID=%s,bucket=%s,object=%s : %w", s.ServiceAccountName, s.ServiceAccountID, bucket, object, err)
+	}
+	return url, nil
+}
