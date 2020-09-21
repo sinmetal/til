@@ -56,8 +56,9 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	signedURLService := createStorageSignedURLService(t)
 
 	const bucket = "sinmetal-ci-signed-url"
+	const contentType = "image/jpg"
 	object := uuid.New().String()
-	putURL, err := signedURLService.CreatePutObjectURL(ctx, bucket, object, "image/jpg", time.Now().Add(10*time.Minute))
+	putURL, err := signedURLService.CreatePutObjectURL(ctx, bucket, object, contentType, time.Now().Add(10*time.Minute))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +72,7 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	const contentType = "image/jpg"
+
 	req.Header.Set("Content-Type", contentType)
 	client := new(http.Client)
 	_, err = client.Do(req)
