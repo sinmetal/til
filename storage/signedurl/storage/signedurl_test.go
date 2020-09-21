@@ -4,30 +4,24 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
 	"time"
 
+	credentials "cloud.google.com/go/iam/credentials/apiv1"
+	"github.com/google/uuid"
 	"google.golang.org/api/iam/v1"
 )
 
 func TestStorageSignedURLService_CreatePutObjectURL(t *testing.T) {
 	ctx := context.Background()
 
-	iamService, err := iam.NewService(ctx)
-	if err != nil {
-		panic(err)
-	}
-	signedURLService, err := NewStorageSignedURLService(ctx, "signedurl@sinmetal-ci.iam.gserviceaccount.com", fmt.Sprintf("projects/%s/serviceAccounts/%s", "sinmetal-ci", "signedurl@sinmetal-ci.iam.gserviceaccount.com"), iamService)
-	if err != nil {
-		panic(err)
-	}
+	signedURLService := createStorageSignedURLService(t)
 
 	object := uuid.New().String()
-	url, err := signedURLService.CreatePutObjectURL(ctx, "sinmetal-ci-signed-url", object, "image/jpg", time.Now().Add(10*time.Minute))
+	u, err := signedURLService.CreatePutObjectURL(ctx, "sinmetal-ci-signed-url", object, "image/jpg", time.Now().Add(10*time.Minute))
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +31,7 @@ func TestStorageSignedURLService_CreatePutObjectURL(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Generates *http.Request to request with PUT method to the Signed URL.
-	req, err := http.NewRequest("PUT", url, bytes.NewReader(b))
+	req, err := http.NewRequest("PUT", u, bytes.NewReader(b))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,20 +53,13 @@ func TestStorageSignedURLService_CreatePutObjectURL(t *testing.T) {
 func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 	ctx := context.Background()
 
-	iamService, err := iam.NewService(ctx)
-	if err != nil {
-		panic(err)
-	}
-	signedURLService, err := NewStorageSignedURLService(ctx, "signedurl@sinmetal-ci.iam.gserviceaccount.com", fmt.Sprintf("projects/%s/serviceAccounts/%s", "sinmetal-ci", "signedurl@sinmetal-ci.iam.gserviceaccount.com"), iamService)
-	if err != nil {
-		panic(err)
-	}
+	signedURLService := createStorageSignedURLService(t)
 
 	const bucket = "sinmetal-ci-signed-url"
 	object := uuid.New().String()
 	putURL, err := signedURLService.CreatePutObjectURL(ctx, bucket, object, "image/jpg", time.Now().Add(10*time.Minute))
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	b, err := ioutil.ReadFile("/Users/sinmetal/go/src/github.com/sinmetal/til/storage/signedurl/sinmetal.jpg")
@@ -102,4 +89,24 @@ func TestStorageSignedURLService_CreateDownloadURL(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(dlURL)
+}
+
+func createStorageSignedURLService(t *testing.T) *StorageSignedURLService {
+	ctx := context.Background()
+
+	iamService, err := iam.NewService(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	iamCredentialsClient, err := credentials.NewIamCredentialsClient(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signedURLService, err := NewStorageSignedURLService(ctx, "signedurl@sinmetal-ci.iam.gserviceaccount.com", fmt.Sprintf("projects/%s/serviceAccounts/%s", "sinmetal-ci", "signedurl@sinmetal-ci.iam.gserviceaccount.com"), iamService, iamCredentialsClient)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return signedURLService
 }
