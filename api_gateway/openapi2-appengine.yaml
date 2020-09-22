@@ -1,0 +1,23 @@
+# openapi2-appengine.yaml
+swagger: '2.0'
+info:
+  title: gae-sample optional-string
+  description: Sample API on API Gateway with an App Engine backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /hello:
+    get:
+      summary: Greet a user
+      operationId: hello
+      x-google-backend:
+        address: https://sinmetal-api-gateway-us.uc.r.appspot.com/hello
+        jwt_audience: 6683075010-chi9gf6ii3bqse42bu18gun7d77rkjso.apps.googleusercontent.com
+      responses:
+        '200':
+          description: A successful response
+          schema:
+            type: string
