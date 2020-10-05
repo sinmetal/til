@@ -11,8 +11,9 @@
     function upload() {
         const file = document.getElementById("example").files[0];
         console.log(file.name);
+        console.log(file.size);
 
-        fetch("/signedURL?contentType=" + file.type, {
+        fetch("/signedURL?contentType=" + file.type + "&contentLength=" + file.size, {
             method: 'GET',
         })
             .then(response => response.json())
@@ -22,6 +23,7 @@
                     mode: 'cors',
                     headers: {
                         'Content-Type': file.type,
+                        'Content-Length': file.size,
                         'Content-Disposition': 'attachment; filename="' + file.name + '"'
                     },
                     body: file,

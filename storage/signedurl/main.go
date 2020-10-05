@@ -7,8 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
+	credentials "cloud.google.com/go/iam/credentials/apiv1"
 	"github.com/google/uuid"
 	"google.golang.org/api/iam/v1"
 
@@ -22,7 +24,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	signedURLService, err := storage.NewStorageSignedURLService(ctx, "signedurl@sinmetal-ci.iam.gserviceaccount.com", fmt.Sprintf("projects/%s/serviceAccounts/%s", "sinmetal-ci", "signedurl@sinmetal-ci.iam.gserviceaccount.com"), iamService)
+	iamCredentialsClient, err := credentials.NewIamCredentialsClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+	signedURLService, err := storage.NewStorageSignedURLService(ctx, "signedurl@sinmetal-ci.iam.gserviceaccount.com", fmt.Sprintf("projects/%s/serviceAccounts/%s", "sinmetal-ci", "signedurl@sinmetal-ci.iam.gserviceaccount.com"), iamService, iamCredentialsClient)
 	if err != nil {
 		panic(err)
 	}
@@ -52,8 +58,36 @@ func (h *Handlers) HandleGetSignedURL(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	contentType := r.FormValue("contentType")
+	switch contentType {
+	case "application/pdf",
+		"application/epub+zip",
+		"application/zip", "application/x-zip-compressed":
+		// ok!
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte("Files that can be uploaded are pdf or epub or zip."))
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		return
+	}
+
+	contentLength := r.FormValue("contentLength")
+	length, err := strconv.ParseInt(contentLength, 10, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	if length > 100*1024 {
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte("File Size that can be uploaded is up to 100KiB."))
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		return
+	}
 	object := uuid.New().String()
-	url, err := h.signedURLService.CreatePutObjectURL(ctx, "sinmetal-ci-signed-url", object, contentType, time.Now().Add(10*time.Minute))
+	url, err := h.signedURLService.CreatePutObjectURL(ctx, "sinmetal-ci-signed-url", object, contentType, length, time.Now().Add(10*time.Minute))
 	if err != nil {
 		fmt.Println(err.Error())
 		return
