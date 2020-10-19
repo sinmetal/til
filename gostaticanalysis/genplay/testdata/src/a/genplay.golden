@@ -2,3 +2,7 @@
 package a
 
 var _ = HogeEntity
+
+func (e *HogeEntity) Getn() int {
+	return this.n
+}
