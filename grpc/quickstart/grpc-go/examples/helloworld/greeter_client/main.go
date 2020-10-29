@@ -27,16 +27,21 @@ import (
 
 	pb "github.com/sinmetal/til/grpc/quickstart/grpc-go/examples/helloworld/helloworld"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
-	address     = "localhost:50051"
+	address     = "greeting.sinmetalcraft.jp:443"
 	defaultName = "world"
 )
 
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	cred, err := credentials.NewClientTLSFromFile("cert.pem", "")
+	if err != nil {
+		panic(err)
+	}
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(cred), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -48,9 +53,9 @@ func main() {
 	if len(os.Args) > 1 {
 		name = os.Args[1]
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	r, err := c.SayHelloAgain(ctx, &pb.HelloRequest{Name: name})
+	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: name})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}

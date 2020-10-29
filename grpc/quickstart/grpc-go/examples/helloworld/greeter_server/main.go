@@ -24,6 +24,7 @@ import (
 	"log"
 	"net"
 
+	"google.golang.org/grpc/credentials"
 	pb "github.com/sinmetal/til/grpc/quickstart/grpc-go/examples/helloworld/helloworld"
 	"google.golang.org/grpc"
 )
@@ -52,6 +53,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	credentials.NewServerTLSFromFile("", "")
 	s := grpc.NewServer()
 	pb.RegisterGreeterServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
