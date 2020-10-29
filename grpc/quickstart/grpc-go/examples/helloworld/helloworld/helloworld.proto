@@ -23,11 +23,19 @@ package helloworld;
 
 // The greeting service definition.
 service Greeter {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {}
+
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 
   // Sends another greeting
   rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
+}
+
+message HealthCheckRequest {
+}
+
+message HealthCheckResponse {
 }
 
 // The request message containing the user's name.
