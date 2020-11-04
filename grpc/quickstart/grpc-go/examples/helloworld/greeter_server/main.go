@@ -24,9 +24,10 @@ import (
 	"log"
 	"net"
 
-	"google.golang.org/grpc/credentials"
 	pb "github.com/sinmetal/til/grpc/quickstart/grpc-go/examples/helloworld/helloworld"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
 )
 
 const (
@@ -36,6 +37,10 @@ const (
 // server is used to implement helloworld.GreeterServer.
 type server struct {
 	pb.UnimplementedGreeterServer
+}
+
+func (s *server) Check(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
 }
 
 // SayHello implements helloworld.GreeterServer
@@ -54,9 +59,9 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	credentials.NewServerTLSFromFile("", "")
 	s := grpc.NewServer()
 	pb.RegisterGreeterServer(s, &server{})
+	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
