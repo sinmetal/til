@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
-	"io/ioutil"
 	"log"
 	"time"
 
@@ -32,8 +31,6 @@ func main() {
 
 	address := flag.String("host", "localhost:50051", "host:port of gRPC server")
 	insecure := flag.Bool("insecure", false, "connect without TLS")
-	cacert := flag.String("cacert", "CA_crt.pem", "CACert for server")
-	serverName := flag.String("servername", "grpc.domain.com", "CACert for server")
 	flag.Parse()
 
 	var err error
@@ -41,20 +38,14 @@ func main() {
 		conn, err = grpc.Dial(*address, grpc.WithInsecure())
 	} else {
 
-		var tlsCfg tls.Config
-		rootCAs := x509.NewCertPool()
-		pem, err := ioutil.ReadFile(*cacert)
+		systemRoots, err := x509.SystemCertPool()
 		if err != nil {
-			log.Fatalf("failed to load root CA certificates  error=%v", err)
+			panic(err)
 		}
-		if !rootCAs.AppendCertsFromPEM(pem) {
-			log.Fatalf("no root CA certs parsed from file ")
-		}
-		tlsCfg.RootCAs = rootCAs
-		tlsCfg.ServerName = *serverName
-
-		ce := credentials.NewTLS(&tlsCfg)
-		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(ce))
+		cred := credentials.NewTLS(&tls.Config{
+			RootCAs: systemRoots,
+		})
+		conn, err = grpc.Dial(*address, grpc.WithTransportCredentials(cred))
 	}
 
 	if err != nil {
