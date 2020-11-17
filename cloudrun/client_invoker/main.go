@@ -11,6 +11,7 @@ import (
 
 	"github.com/sinmetalcraft/silverdile/v2"
 	log "github.com/vvakame/sdlog/aelog"
+	"golang.org/x/oauth2"
 	"golang.org/x/xerrors"
 	"google.golang.org/api/idtoken"
 )
@@ -54,26 +55,19 @@ func downloadImageFromIronLizard(ctx context.Context, u string, w http.ResponseW
 	if err != nil {
 		return xerrors.Errorf("failed idtoken.NewTokenSource %#v : %w", imgInfo, err)
 	}
-	token, err := tokenSource.Token()
-	if err != nil {
-		return xerrors.Errorf("failed tokenSource.Token() %#v : %w", imgInfo, err)
-	}
-	fmt.Println(token.Expiry)
-	fmt.Println(token.AccessToken)
 
 	fmt.Println(serviceURL)
 	req, err := http.NewRequest("GET", serviceURL, nil)
 	if err != nil {
 		return xerrors.Errorf("failed http.NewRequest %#v : %w", imgInfo, err)
 	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.AccessToken))
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := oauth2.NewClient(ctx, tokenSource).Do(req)
 	if err != nil {
-		return xerrors.Errorf("failed request to IronLizard : %s : %w", serviceURL, err)
+		return xerrors.Errorf("failed request : %s : %w", serviceURL, err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Warningf(ctx, "failed response.body.close from IronLizard. err=%v", err)
+			log.Warningf(ctx, "failed response.body.close. err=%v", err)
 		}
 	}()
 	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
