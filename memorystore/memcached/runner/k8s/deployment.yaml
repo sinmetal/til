@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached-runner-dep
+  labels:
+    app: memcached-runner-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached-runner-dep
+  template:
+    metadata:
+      labels:
+        app: memcached-runner-dep
+    spec:
+      containers:
+        - name: memcached-runner-dep
+          image: gcr.io/$PROJECT_ID/sinmetal/memcached_runner/master

@@ -11,8 +11,8 @@ steps:
     args:
       - set
       - image
-      - deployment/memcached_runner-dep
-      - memcached_runner-dep=gcr.io/$PROJECT_ID/sinmetal/memcached_runner/$BRANCH_NAME:$COMMIT_SHA
+      - deployment/memcached-runner-dep
+      - memcached-runner-dep=gcr.io/$PROJECT_ID/sinmetal/memcached_runner/$BRANCH_NAME:$COMMIT_SHA
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=asia-northeast1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=sinmetal-tokyo'
