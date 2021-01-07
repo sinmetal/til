@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	mem := memcache.New("10.14.80.3:11211")
+	mem := memcache.New("10.14.80.4:11211")
 	mem.MaxIdleConns = 200
 
 	for {
