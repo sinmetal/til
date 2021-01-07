@@ -10,11 +10,11 @@ import (
 
 func main() {
 	mem := memcache.New("10.14.80.3:11211")
-	mem.MaxIdleConns = 1000
+	mem.MaxIdleConns = 200
 
 	for {
 		var wg sync.WaitGroup
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < 100; i++ {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
