@@ -1,0 +1,19 @@
+steps:
+  - name: 'golang:1.15-buster'
+    entrypoint: 'go'
+    args: ['build', '.']
+    dir: 'memorystore/memcached/runner'
+    env: ['GO111MODULE=on']
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'memorystore/memcached/runner'
+    args: ['build', '--tag=gcr.io/$PROJECT_ID/sinmetal/memcached_runner/$BRANCH_NAME:$COMMIT_SHA', '.']
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - set
+      - image
+      - deployment/memcached-runner-dep
+      - memcached-runner-dep=gcr.io/$PROJECT_ID/sinmetal/memcached_runner/$BRANCH_NAME:$COMMIT_SHA
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=asia-northeast1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=sinmetal-tokyo'
+images: ['gcr.io/$PROJECT_ID/sinmetal/memcached_runner/$BRANCH_NAME:$COMMIT_SHA']
