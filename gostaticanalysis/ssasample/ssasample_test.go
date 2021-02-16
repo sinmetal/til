@@ -5,6 +5,7 @@ import (
 
 	"github.com/gostaticanalysis/testutil"
 	"golang.org/x/tools/go/analysis/analysistest"
+
 	"ssasample"
 )
 
