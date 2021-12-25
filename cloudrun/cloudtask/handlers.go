@@ -41,10 +41,15 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	_, err := h.tasks.CreateTask(ctx, req)
+	task, err := h.tasks.CreateTask(ctx, req)
 	if err != nil {
 		fmt.Printf("failed cloudtasks.CreateTask: %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte(task.Name))
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 
