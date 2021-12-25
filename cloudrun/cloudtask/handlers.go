@@ -40,7 +40,7 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 			DispatchDeadline: &durationpb.Duration{
-				Seconds: 3600,
+				Seconds: 1800,
 				Nanos:   0,
 			},
 		},
