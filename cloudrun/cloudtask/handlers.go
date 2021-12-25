@@ -7,6 +7,7 @@ import (
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type Handlers struct {
@@ -37,6 +38,10 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 						},
 					},
 				},
+			},
+			DispatchDeadline: &durationpb.Duration{
+				Seconds: 3600,
+				Nanos:   0,
 			},
 		},
 	}
