@@ -62,8 +62,9 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) ServeTask(w http.ResponseWriter, r *http.Request) {
 	taskName := r.Header.Get("X-CloudTasks-TaskName")
 	taskExecutionCount := r.Header.Get("X-CloudTasks-TaskExecutionCount")
+	taskRetryCount := r.Header.Get("X-CloudTasks-TaskRetryCount")
 	for i := 0; i < 4000; i++ {
-		fmt.Printf("timeCount:%s:%s:%d\n", taskName, taskExecutionCount, i)
+		fmt.Printf("timeCount-v2:%s:%s:%s:%d\n", taskName, taskExecutionCount, taskRetryCount, i)
 		time.Sleep(1 * time.Second)
 	}
 }
