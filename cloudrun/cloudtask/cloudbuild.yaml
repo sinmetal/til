@@ -25,4 +25,5 @@ steps:
       - --memory=256M
       - --concurrency=8
       - --allow-unauthenticated
+      - --timeout=60m
       - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/app/$BRANCH_NAME:$COMMIT_SHA
