@@ -12,7 +12,6 @@ steps:
       - --dockerfile=backend/Dockerfile
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     entrypoint: 'gcloud'
-    waitFor: ['gobuild']
     args:
       - beta
       - run
