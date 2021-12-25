@@ -30,10 +30,10 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 			MessageType: &taskspb.Task_HttpRequest{
 				HttpRequest: &taskspb.HttpRequest{
 					HttpMethod: taskspb.HttpMethod_POST,
-					Url:        "url",
+					Url:        "https://appserver-2jsu5stp3a-an.a.run.app/tasks/serve",
 					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
 						OidcToken: &taskspb.OidcToken{
-							ServiceAccountEmail: "email",
+							ServiceAccountEmail: "run-default@sinmetal-playground-20211225.iam.gserviceaccount.com",
 						},
 					},
 				},
