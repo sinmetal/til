@@ -67,4 +67,6 @@ func (h *Handlers) ServeTask(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("timeCount-v2:%s:%s:%s:%d\n", taskName, taskExecutionCount, taskRetryCount, i)
 		time.Sleep(1 * time.Second)
 	}
+	fmt.Printf("timeCount-v2:%s:%s:%s:%d\n", taskName, taskExecutionCount, taskRetryCount, 9999)
+	w.WriteHeader(http.StatusOK)
 }
