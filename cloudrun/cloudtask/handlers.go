@@ -18,19 +18,18 @@ type Handlers struct {
 func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	r.FormValue("")
-
 	// Build the Task queue path.
 	queuePath := fmt.Sprintf("projects/%s/locations/%s/queues/%s", "sinmetal-playground-20211225", "asia-northeast1", "test")
 
 	id := uuid.New().String()
+	taskName := fmt.Sprintf("%s/tasks/%s", queuePath, id)
 
 	// Build the Task payload.
 	// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#CreateTaskRequest
 	req := &taskspb.CreateTaskRequest{
 		Parent: queuePath,
 		Task: &taskspb.Task{
-			Name: id,
+			Name: taskName,
 			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#HttpRequest
 			MessageType: &taskspb.Task_HttpRequest{
 				HttpRequest: &taskspb.HttpRequest{
