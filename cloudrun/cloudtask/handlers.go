@@ -6,6 +6,7 @@ import (
 	"time"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"github.com/google/uuid"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
@@ -22,16 +23,19 @@ func (h *Handlers) AddTask(w http.ResponseWriter, r *http.Request) {
 	// Build the Task queue path.
 	queuePath := fmt.Sprintf("projects/%s/locations/%s/queues/%s", "sinmetal-playground-20211225", "asia-northeast1", "test")
 
+	id := uuid.New().String()
+
 	// Build the Task payload.
 	// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#CreateTaskRequest
 	req := &taskspb.CreateTaskRequest{
 		Parent: queuePath,
 		Task: &taskspb.Task{
+			Name: id,
 			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#HttpRequest
 			MessageType: &taskspb.Task_HttpRequest{
 				HttpRequest: &taskspb.HttpRequest{
 					HttpMethod: taskspb.HttpMethod_POST,
-					Url:        "https://appserver-2jsu5stp3a-an.a.run.app/tasks/serve",
+					Url:        fmt.Sprintf("https://appserver-2jsu5stp3a-an.a.run.app/tasks/serve?id=%s", id),
 					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
 						OidcToken: &taskspb.OidcToken{
 							ServiceAccountEmail: "run-default@sinmetal-playground-20211225.iam.gserviceaccount.com",
