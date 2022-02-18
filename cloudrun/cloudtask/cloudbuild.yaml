@@ -1,0 +1,29 @@
+steps:
+  - name: 'golang:1.16'
+    id: 'gobuild'
+    entrypoint: 'go'
+    dir: 'cloudrun/cloudtask'
+    args: ['build', '-o', 'app', '.']
+  - name: 'gcr.io/kaniko-project/executor:v1.3.0'
+    args:
+      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/app/$BRANCH_NAME:$COMMIT_SHA
+      - --cache=true
+      - --cache-ttl=6h
+      - --dockerfile=cloudrun/cloudtask/Dockerfile
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    entrypoint: 'gcloud'
+    args:
+      - beta
+      - run
+      - deploy
+      - appserver
+      - --region=asia-northeast1
+      - --platform=managed
+      - --service-account=run-default@$PROJECT_ID.iam.gserviceaccount.com
+      - --max-instances=3
+      - --cpu=1
+      - --memory=256M
+      - --concurrency=16
+      - --allow-unauthenticated
+      - --timeout=60m
+      - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/app/$BRANCH_NAME:$COMMIT_SHA
