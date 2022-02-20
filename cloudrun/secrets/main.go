@@ -26,13 +26,6 @@ func ReadSecretEnvHandler(w http.ResponseWriter, r *http.Request) {
 
 func ReadSecretFileHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
-	value := os.Getenv(key)
-	_, err := fmt.Fprintf(w, "%s:%s", key, value)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-
 	fileBody, err := os.ReadFile(key)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
