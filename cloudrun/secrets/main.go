@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -32,7 +33,7 @@ func ReadSecretFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := os.ReadFile(key)
+	fileBody, err := os.ReadFile(key)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err2 := fmt.Fprintf(w, "failed read file %s, err=%s", key, err)
@@ -43,8 +44,12 @@ func ReadSecretFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = fmt.Fprintf(w, "%s:%s", key, string(body))
-	if err != nil {
+	w.Header().Set("content-type", "application/json;charset=utf8")
+	m := map[string]string{
+		"key":  key,
+		"body": string(fileBody),
+	}
+	if err := json.NewEncoder(w).Encode(m); err != nil {
 		fmt.Println(err.Error())
 		return
 	}
