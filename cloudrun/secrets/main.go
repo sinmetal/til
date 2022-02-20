@@ -35,7 +35,7 @@ func ReadSecretFileHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := os.ReadFile(key)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, err2 := fmt.Fprintf(w, "failed read file %s, err=%s", err)
+		_, err2 := fmt.Fprintf(w, "failed read file %s, err=%s", key, err)
 		if err2 != nil {
 			fmt.Println(err2.Error())
 			return
