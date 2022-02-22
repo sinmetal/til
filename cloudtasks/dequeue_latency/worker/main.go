@@ -27,7 +27,7 @@ func ReceiveTaskHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	fmt.Printf("__latency__,receiveTask,%s,%d\n", string(body), time.Now().Unix())
+	fmt.Printf("__latency__,receiveTask,%s,%d\n", string(body), time.Now().UnixNano())
 }
 
 func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +48,7 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	queuePath := fmt.Sprintf("projects/%s/locations/%s/queues/%s", pID, "asia-northeast1", "latency")
 	id := uuid.New().String()
-	fmt.Printf("__latency__,addTask,%s,%d\n", id, time.Now().Unix())
+	fmt.Printf("__latency__,addTask,%s,%d\n", id, time.Now().UnixNano())
 	taskName := fmt.Sprintf("%s/tasks/%s", queuePath, id)
 	// Build the Task payload.
 	// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#CreateTaskRequest
@@ -68,7 +68,7 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add a payload message if one is present.
-	req.Task.GetHttpRequest().Body = []byte(uuid.New().String())
+	req.Task.GetHttpRequest().Body = []byte(id)
 
 	createdTask, err := tasksClient.CreateTask(ctx, req)
 	if err != nil {
@@ -77,7 +77,7 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(createdTask.GetName()))
-	fmt.Printf("__latency__,createdTask,%s,%d\n", id, time.Now().Unix())
+	fmt.Printf("__latency__,createdTask,%s,%d\n", id, time.Now().UnixNano())
 }
 
 func main() {
