@@ -2,28 +2,44 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
+	"time"
+
+	"go.mercari.io/datastore/aedatastore"
+	"google.golang.org/appengine"
 )
 
 func main() {
 	http.HandleFunc("/", indexHandler)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
+	appengine.Main()
+}
 
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
-	}
+type Entity struct {
+	CreatedAt time.Time
 }
 
 // indexHandler responds to requests with our greeting.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.WithContext(r.Context(), r)
+
+	ds, err := aedatastore.FromContext(ctx)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("failed aedatastore.FromContext. %s", err)))
+		return
+	}
+
+	v := Entity{
+		CreatedAt: time.Now(),
+	}
+	_, err = ds.Put(ctx, ds.NameKey("Sample1", time.Now().String(), nil), &v)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("failed datastore.Put() %s", err)))
+		return
+	}
+
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
