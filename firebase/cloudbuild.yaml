@@ -1,0 +1,3 @@
+steps:
+  - name: 'us-central1-docker.pkg.dev/gcpug-container/firebase/main:v11.2.2'
+    args: [ 'deploy', '--project', '$PROJECT_ID']
