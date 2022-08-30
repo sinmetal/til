@@ -17,9 +17,9 @@ func NewService(ctx context.Context, pubsubClient *pubsub.Client) (*Service, err
 	}, nil
 }
 
-func (s *Service)SendMessage(ctx context.Context, message string) (string, error) {
+func (s *Service) SendMessage(ctx context.Context, message string) (string, error) {
 	ret := s.pubsubClient.TopicInProject("filtertest", "sinmetal-ci").Publish(ctx, &pubsub.Message{
-		Data:            []byte(message),
+		Data: []byte(message),
 	})
 	id, err := ret.Get(ctx)
 	if err != nil {
@@ -28,11 +28,11 @@ func (s *Service)SendMessage(ctx context.Context, message string) (string, error
 	return id, nil
 }
 
-func (s *Service)SendMessageBySinmetal(ctx context.Context, message string) (string, error) {
+func (s *Service) SendMessageBySinmetal(ctx context.Context, message string) (string, error) {
 	ret := s.pubsubClient.TopicInProject("filtertest", "sinmetal-ci").Publish(ctx, &pubsub.Message{
-		Data:            []byte(message),
-		Attributes:      map[string]string{
-			"domain":"sinmetal.jp",
+		Data: []byte(message),
+		Attributes: map[string]string{
+			"domain": "sinmetal.jp",
 		},
 	})
 	id, err := ret.Get(ctx)
@@ -42,11 +42,11 @@ func (s *Service)SendMessageBySinmetal(ctx context.Context, message string) (str
 	return id, nil
 }
 
-func (s *Service)SendMessageOnlyGold(ctx context.Context, message string) (string, error) {
+func (s *Service) SendMessageOnlyGold(ctx context.Context, message string) (string, error) {
 	ret := s.pubsubClient.TopicInProject("filtertest", "sinmetal-ci").Publish(ctx, &pubsub.Message{
-		Data:            []byte(message),
-		Attributes:      map[string]string{
-			"gold":"",
+		Data: []byte(message),
+		Attributes: map[string]string{
+			"gold": "",
 		},
 	})
 	id, err := ret.Get(ctx)
@@ -56,7 +56,7 @@ func (s *Service)SendMessageOnlyGold(ctx context.Context, message string) (strin
 	return id, nil
 }
 
-func (s *Service)PullMessage(ctx context.Context, subscriber string) (msg string, err error) {
+func (s *Service) PullMessage(ctx context.Context, subscriber string) (msg string, err error) {
 	err = s.pubsubClient.SubscriptionInProject(subscriber, "sinmetal-ci").Receive(ctx, func(ctx context.Context, message *pubsub.Message) {
 		message.Ack()
 		msg = string(message.Data)
