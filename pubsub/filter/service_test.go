@@ -13,7 +13,7 @@ func TestService_SendMessage(t *testing.T) {
 	ctx := context.Background()
 
 	pubsubClient, err := pubsub.NewClient(ctx, "sinmetal-ci")
-	if err!= nil {
+	if err != nil {
 		t.Fatal(err)
 	}
 	s, err := filterbox.NewService(ctx, pubsubClient)
