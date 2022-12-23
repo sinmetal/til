@@ -14,7 +14,8 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 ```
 SERVICE_ACCOUNT=gcs-trigger@sinmetal-gcs-trigger-20221222.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:${SERVICE_ACCOUNT}" --role='roles/eventarc.eventReceiver'
-gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:${SERVICE_ACCOUNT}" --role='roles/cloudfunctions.invoker'
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:${SERVICE_ACCOUNT}" --role='roles/cloudfunctions.invoker' # いるのか？
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:${SERVICE_ACCOUNT}" --role='roles/run.invoker'
 ```
 
 ```
@@ -24,7 +25,8 @@ gcloud functions deploy gcs-trigger-tokyo-function \
   --runtime=go119 \
   --source=./ \
   --entry-point=GCSTriggerFunction \
+  --trigger-location=asia \
   --trigger-event-filters="type=google.cloud.storage.object.v1.finalized" \
-  --trigger-event-filters="bucket=sinmetal-gcs-trigger-tokyo" \
+  --trigger-event-filters="bucket=sinmetal-gcs-trigger-asia" \
   --trigger-service-account="gcs-trigger@sinmetal-gcs-trigger-20221222.iam.gserviceaccount.com"
 ```
