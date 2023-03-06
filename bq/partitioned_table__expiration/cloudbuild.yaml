@@ -1,7 +1,10 @@
 steps:
 - name: 'hashicorp/terraform:latest'
   args: [ 'init']
+  dir: 'bq/partitioned_table_expiration'
 - name: 'hashicorp/terraform:latest'
   args: [ 'plan']
+  dir: 'bq/partitioned_table_expiration'
 - name: 'hashicorp/terraform:latest'
   args: [ 'apply', '-auto-approve']
+  dir: 'bq/partitioned_table_expiration'
