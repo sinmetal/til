@@ -4,7 +4,8 @@ resource "google_bigquery_table" "bar" {
   table_id   = "bar"
 
   time_partitioning {
-    type = "DAY"
+    type          = "DAY"
+    expiration_ms = 10 * 24 * 3600 * 1000
   }
 
   schema = <<EOF
