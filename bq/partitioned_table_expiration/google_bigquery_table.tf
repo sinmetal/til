@@ -55,3 +55,31 @@ resource "google_bigquery_table" "foo" {
 EOF
 
 }
+
+resource "google_bigquery_table" "hoge" {
+  project    = "terraform20230306"
+  dataset_id = google_bigquery_dataset.first_dataset.dataset_id
+  table_id   = "hoge"
+
+  time_partitioning {
+    type          = "DAY"
+  }
+
+  schema = <<EOF
+[
+  {
+    "name": "permalink",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "The Permalink"
+  },
+  {
+    "name": "state",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "State where the head office is located"
+  }
+]
+EOF
+
+}
