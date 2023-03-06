@@ -62,7 +62,7 @@ resource "google_bigquery_table" "hoge" {
   table_id   = "hoge"
 
   time_partitioning {
-    type          = "DAY"
+    type = "DAY"
   }
 
   schema = <<EOF
