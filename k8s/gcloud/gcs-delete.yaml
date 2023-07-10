@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delete-gcs-objects-20230710a
+spec:
+  template:
+    spec:
+      containers:
+      - name: delete-gcs-objects-20230710a
+        image: gcr.io/google.com/cloudsdktool/google-cloud-cli:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            gcloud config list
+            gcloud storage cat gs://sinmetal-work/delete-target-list.csv | gcloud storage rm -I
+      restartPolicy: Never
+  backoffLimit: 0
